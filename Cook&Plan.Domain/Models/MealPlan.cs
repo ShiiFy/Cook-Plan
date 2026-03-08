@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cook_Plan.Domain.Models
+﻿namespace Cook_Plan.Domain.Models
 {
     /// План питания на одну календарную неделю.
     public class MealPlan
