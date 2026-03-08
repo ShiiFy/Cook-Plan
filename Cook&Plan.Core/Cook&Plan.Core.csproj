@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Cook_Plan.Core</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cook&amp;Plan.Data\Cook&amp;Plan.Data.csproj" />
+    <ProjectReference Include="..\Cook&amp;Plan.Domain\Cook&amp;Plan.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
