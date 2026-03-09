@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Cook&amp;Plan.Core\Cook&amp;Plan.Core.csproj" />
     <ProjectReference Include="..\Cook&amp;Plan.Domain\Cook&amp;Plan.Domain.csproj" />
   </ItemGroup>
