@@ -1,28 +1,17 @@
-﻿using Cook_Plan.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Cook_Plan.Core.Composite;
+using Cook_Plan.Domain.Models;
 
 namespace Cook_Plan.Core.Factories
 {
     public class SingleRecipeShoppingListFactory : ShoppingListFactory<Recipe>
     {
+        private readonly CompositeShoppingListFactory _compositeFactory = new();
+
         public override ShoppingList Create(Recipe recipe)
         {
-            var shoppingList = new ShoppingList {CreatedAt = DateOnly.FromDateTime(DateTime.Today)};
+            var recipeComponent = new CompositeRecipe(recipe);
 
-            shoppingList.Items = recipe.Ingredients
-            .Select(i => new ShoppingListItem
-            {
-                ProductId = i.ProductId,
-                Amount = i.Amount,
-                IsPurchased = false
-            })
-            .ToList();
-
-            return shoppingList;
+            return _compositeFactory.Create(recipeComponent);
         }
     }
 }

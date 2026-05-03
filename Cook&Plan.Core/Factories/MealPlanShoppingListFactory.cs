@@ -1,30 +1,26 @@
-﻿using Cook_Plan.Domain.Models;
+﻿using Cook_Plan.Core.Composite;
+using Cook_Plan.Domain.Models;
 
 namespace Cook_Plan.Core.Factories
 {
     public class MealPlanShoppingListFactory : ShoppingListFactory<MealPlan>
     {
+        private readonly CompositeShoppingListFactory _compositeFactory = new();
+
         public override ShoppingList Create(MealPlan mealPlan)
         {
-            var shoppingList = new ShoppingList
-            {
-                MealPlanId = mealPlan.Id,
-                CreatedAt = DateOnly.FromDateTime(DateTime.Today)
-            };
+            var week = new WeeklyPlan("План питания");
 
-            var allIngredients = mealPlan.Entries
-                .Where(e => e.Recipe != null)
-                .SelectMany(e => e.Recipe!.Ingredients);
-
-            shoppingList.Items = allIngredients
-            .GroupBy(i => i.ProductId)              // группируем одинаковые продукты
-            .Select(g => new ShoppingListItem       // для каждой группы один item
+            foreach (var entry in mealPlan.Entries)
             {
-                ProductId = g.Key,
-                Amount = g.Sum(i => i.Amount),
-                IsPurchased = false
-            })
-            .ToList();
+                if (entry.Recipe == null)
+                    continue;
+
+                week.Add(new CompositeRecipe(entry.Recipe));
+            }
+
+            var shoppingList = _compositeFactory.Create(week);
+            shoppingList.MealPlanId = mealPlan.Id;
 
             return shoppingList;
         }

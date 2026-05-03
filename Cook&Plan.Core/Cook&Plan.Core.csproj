@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Cook&amp;Plan.Data\Cook&amp;Plan.Data.csproj" />
     <ProjectReference Include="..\Cook&amp;Plan.Domain\Cook&amp;Plan.Domain.csproj" />
   </ItemGroup>
