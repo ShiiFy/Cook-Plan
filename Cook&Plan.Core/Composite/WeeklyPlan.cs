@@ -1,4 +1,5 @@
-﻿using Cook_Plan.Domain.Models;
+﻿using Cook_Plan.Core.Iterator;
+using Cook_Plan.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,13 @@ using System.Threading.Tasks;
 
 namespace Cook_Plan.Core.Composite
 {
-    public class WeeklyPlan : IMealComponent
+    public class WeeklyPlan : IMealComponent, IMealAggregate
     {
         public string Name { get; set; }
 
         private readonly List<IMealComponent> _components = new();
+
+        public int Count => _components.Count;
 
         public WeeklyPlan(string name)
         {
@@ -31,6 +34,11 @@ namespace Cook_Plan.Core.Composite
         public IMealComponent GetChild(int index)
         {
             return _components[index];
+        }
+
+        public IIterator<IMealComponent> CreateIterator()
+        {
+            return new MealPlanIterator(this);
         }
 
         public List<Ingredient> GetIngredientsList()

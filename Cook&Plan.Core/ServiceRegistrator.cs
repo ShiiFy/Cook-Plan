@@ -1,7 +1,10 @@
 ﻿using Cook_Plan.Core.Adapter;
+using Cook_Plan.Core.Command;
 using Cook_Plan.Core.Facade;
 using Cook_Plan.Core.Flyweight;
+using Cook_Plan.Core.Observer;
 using Cook_Plan.Core.Services;
+using Cook_Plan.Core.State;
 using Cook_Plan.Core.Temporarily;
 using Cook_Plan.Data;
 using Cook_Plan.Data.Cache;
@@ -23,16 +26,24 @@ namespace Cook_Plan.Core
 
             // Data layer
             services.AddScoped<IRecipeRepository, CachedRecipeRepositoryProxy>();
-            services.AddSingleton<RecipeCache>();
             services.AddScoped<DatabaseRecipeRepository>();
+            services.AddSingleton<RecipeCache>();
 
             // Core layer
+            services.AddSingleton<ISubject, CookPlanSubject>();
+
             services.AddSingleton<RecipeCacheManager>();
-            services.AddScoped<RecipeService>();
             services.AddSingleton<IngredientFlyweightFactory>();
+
+            services.AddScoped<RecipeService>();
             services.AddScoped<MealPlanningFacade>();
+            services.AddScoped<MealPlanContext>();
+
             services.AddScoped<IExternalRecipeImporter, ExternalApiRecipeAdapter>();
             services.AddScoped<RecipeImportService>();
+            services.AddScoped<RecipeMediaService>();
+
+            services.AddTransient<CommandInvoker>();
 
             return services;
         }

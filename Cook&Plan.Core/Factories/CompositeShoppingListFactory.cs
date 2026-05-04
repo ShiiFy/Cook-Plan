@@ -1,4 +1,5 @@
 ﻿using Cook_Plan.Core.Composite;
+using Cook_Plan.Core.Iterator;
 using Cook_Plan.Domain.Models;
 
 namespace Cook_Plan.Core.Factories
@@ -7,7 +8,13 @@ namespace Cook_Plan.Core.Factories
     {
         public override ShoppingList Create(IMealComponent source)
         {
-            var ingredients = source.GetIngredientsList();
+            var ingredientIterator = new IngredientIterator(source);
+            var ingredients = new List<Ingredient>();
+
+            for (ingredientIterator.First(); !ingredientIterator.IsDone(); ingredientIterator.Next())
+            {
+                ingredients.Add(ingredientIterator.CurrentItem());
+            }
 
             var shoppingList = new ShoppingList
             {

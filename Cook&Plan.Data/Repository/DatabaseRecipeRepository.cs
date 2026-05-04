@@ -85,7 +85,7 @@ namespace Cook_Plan.Data.Repository
         }
         public void AddRecipe(Recipe recipe)
         {
-            var dbRecipe = new Cook_Plan.Domain.DBModels.DBRecipe
+            var dbRecipe = new DBRecipe
             {
                 Name = recipe.Name,
                 Description = recipe.Description,
@@ -94,11 +94,13 @@ namespace Cook_Plan.Data.Repository
                 Difficulty = recipe.Difficulty,
                 CookingTimeMinutes = recipe.CookingTimeMinutes,
                 Servings = recipe.Servings,
-                Ingredients = recipe.Ingredients.Select(i => new Cook_Plan.Domain.DBModels.DBIngredient
+                PhotoPath = recipe.PhotoPath,
+
+                Ingredients = recipe.Ingredients.Select(i => new DBIngredient
                 {
                     Amount = (decimal)i.Amount,
                     ProductId = i.ProductId,
-                    Product = i.Product != null ? new Cook_Plan.Domain.DBModels.DBProduct
+                    Product = i.Product != null ? new DBProduct
                     {
                         Name = i.Product.Name,
                         Calories = i.Product.CaloriesPer100,
@@ -107,17 +109,19 @@ namespace Cook_Plan.Data.Repository
                         Carbohydrates = i.Product.CarbsPer100
                     } : null
                 }).ToList(),
-                Steps = recipe.Steps.Select(s => new Cook_Plan.Domain.DBModels.DBRecipeStep
+
+                Steps = recipe.Steps.Select(s => new DBRecipeStep
                 {
                     StepNumber = s.StepNumber,
-                    Description = s.Description
+                    Description = s.Description,
+                    PhotoPath = s.PhotoPath
                 }).ToList()
             };
 
             _context.Recipes.Add(dbRecipe);
             _context.SaveChanges();
 
-            recipe.Id = dbRecipe.Id; 
+            recipe.Id = dbRecipe.Id;
         }
         public void UpdateRecipe(Recipe recipe)
         {
@@ -126,33 +130,35 @@ namespace Cook_Plan.Data.Repository
                 .Include(r => r.Steps)
                 .FirstOrDefault(r => r.Id == recipe.Id);
 
-            if (dbRecipe != null)
+            if (dbRecipe == null)
+                return;
+
+            dbRecipe.Name = recipe.Name;
+            dbRecipe.Description = recipe.Description;
+            dbRecipe.MealType = recipe.MealType;
+            dbRecipe.Cuisine = recipe.Cuisine;
+            dbRecipe.Difficulty = recipe.Difficulty;
+            dbRecipe.CookingTimeMinutes = recipe.CookingTimeMinutes;
+            dbRecipe.Servings = recipe.Servings;
+            dbRecipe.PhotoPath = recipe.PhotoPath;
+
+            _context.Ingredients.RemoveRange(dbRecipe.Ingredients);
+            _context.RecipeSteps.RemoveRange(dbRecipe.Steps);
+
+            dbRecipe.Ingredients = recipe.Ingredients.Select(i => new DBIngredient
             {
-                dbRecipe.Name = recipe.Name;
-                dbRecipe.Description = recipe.Description;
-                dbRecipe.MealType = recipe.MealType;
-                dbRecipe.Cuisine = recipe.Cuisine;
-                dbRecipe.Difficulty = recipe.Difficulty;
-                dbRecipe.CookingTimeMinutes = recipe.CookingTimeMinutes;
-                dbRecipe.Servings = recipe.Servings;
+                Amount = (decimal)i.Amount,
+                ProductId = i.ProductId
+            }).ToList();
 
-                _context.Ingredients.RemoveRange(dbRecipe.Ingredients);
-                _context.RecipeSteps.RemoveRange(dbRecipe.Steps);
+            dbRecipe.Steps = recipe.Steps.Select(s => new DBRecipeStep
+            {
+                StepNumber = s.StepNumber,
+                Description = s.Description,
+                PhotoPath = s.PhotoPath
+            }).ToList();
 
-                dbRecipe.Ingredients = recipe.Ingredients.Select(i => new Cook_Plan.Domain.DBModels.DBIngredient
-                {
-                    Amount = (decimal)i.Amount,
-                    ProductId = i.ProductId
-                }).ToList();
-
-                dbRecipe.Steps = recipe.Steps.Select(s => new Cook_Plan.Domain.DBModels.DBRecipeStep
-                {
-                    StepNumber = s.StepNumber,
-                    Description = s.Description
-                }).ToList();
-
-                _context.SaveChanges();
-            }
+            _context.SaveChanges();
         }
         public void DeleteRecipe(int id)
         {
