@@ -7,13 +7,13 @@ namespace Cook_Plan.Data.Repository
     public class CachedRecipeRepositoryProxy : IRecipeRepository
     {
         private readonly AppDbContext _context;
-        private DatabaseRecipeRepository? _realRepository; 
         private readonly RecipeCache _cache;
+        private DatabaseRecipeRepository? _realRepository;
 
-        public CachedRecipeRepositoryProxy(AppDbContext context)
+        public CachedRecipeRepositoryProxy(AppDbContext context, RecipeCache cache)
         {
             _context = context;
-            _cache = RecipeCache.Instance; 
+            _cache = cache;
         }
 
         private DatabaseRecipeRepository GetRealRepository()
@@ -22,6 +22,7 @@ namespace Cook_Plan.Data.Repository
             {
                 _realRepository = new DatabaseRecipeRepository(_context);
             }
+
             return _realRepository;
         }
 
@@ -41,20 +42,31 @@ namespace Cook_Plan.Data.Repository
 
             return recipe;
         }
+
         public List<Recipe> GetAllRecipes()
         {
-            return GetRealRepository().GetAllRecipes();
+            var recipes = GetRealRepository().GetAllRecipes();
+
+            foreach (var recipe in recipes)
+            {
+                _cache.Set(recipe);
+            }
+
+            return recipes;
         }
+
         public void AddRecipe(Recipe recipe)
         {
             GetRealRepository().AddRecipe(recipe);
-            _cache.Set(recipe); 
+            _cache.Set(recipe);
         }
+
         public void UpdateRecipe(Recipe recipe)
         {
             GetRealRepository().UpdateRecipe(recipe);
-            _cache.Set(recipe); 
+            _cache.Set(recipe);
         }
+
         public void DeleteRecipe(int id)
         {
             GetRealRepository().DeleteRecipe(id);

@@ -3,9 +3,23 @@ using Cook_Plan.Domain.Models;
 
 namespace Cook_Plan.Core.Temporarily
 {
-    public static class RecipeCacheManager
+    public class RecipeCacheManager
     {
-        public static List<Recipe> GetAllCached() => RecipeCache.Instance.GetAll();
-        public static int GetCacheHashCode() => RecipeCache.Instance.GetHashCode();
+        private readonly RecipeCache _recipeCache;
+
+        public RecipeCacheManager(RecipeCache recipeCache)
+        {
+            _recipeCache = recipeCache;
+        }
+
+        public List<Recipe> GetAllCached()
+        {
+            return _recipeCache.GetAll();
+        }
+
+        public int GetCacheHashCode()
+        {
+            return _recipeCache.GetHashCode();
+        }
     }
 }

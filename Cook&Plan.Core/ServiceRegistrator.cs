@@ -1,5 +1,10 @@
-﻿using Cook_Plan.Core.Services;
+﻿using Cook_Plan.Core.Adapter;
+using Cook_Plan.Core.Facade;
+using Cook_Plan.Core.Flyweight;
+using Cook_Plan.Core.Services;
+using Cook_Plan.Core.Temporarily;
 using Cook_Plan.Data;
+using Cook_Plan.Data.Cache;
 using Cook_Plan.Data.Interface;
 using Cook_Plan.Data.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -16,13 +21,23 @@ namespace Cook_Plan.Core
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
 
+            // Data layer
             services.AddScoped<IRecipeRepository, CachedRecipeRepositoryProxy>();
+            services.AddSingleton<RecipeCache>();
+            services.AddScoped<DatabaseRecipeRepository>();
+
+            // Core layer
+            services.AddSingleton<RecipeCacheManager>();
             services.AddScoped<RecipeService>();
+            services.AddSingleton<IngredientFlyweightFactory>();
+            services.AddScoped<MealPlanningFacade>();
+            services.AddScoped<IExternalRecipeImporter, ExternalApiRecipeAdapter>();
+            services.AddScoped<RecipeImportService>();
 
             return services;
         }
 
-        // Вспомогательный метод для автоматических миграций (если нужно)
+        // Вспомогательный метод для автоматических миграций
         public static void ApplyMigrations(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
